@@ -1,0 +1,4 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://rwuser:evAI_2019@10.0.1.17:8635,10.0.1.77:8635/evai_data?authSource=admin
