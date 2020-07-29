@@ -4,7 +4,7 @@ import com.evai.testing.automation.api.generators.article.policies.ArticleGenera
 
 public class ThrowOnNotFound implements ArticleGeneratorNotFoundPolicy {
     @Override
-    public void OnLayerNotFound(String layerName) {
+    public void onLayer(String layerName) {
         throw new IllegalArgumentException(String.format("Layer '%s' has not been found", layerName));
     }
 }

@@ -2,10 +2,9 @@ package com.evai.testing.automation.api.generators.article;
 
 import com.evai.commons.model.EvAIInputClient;
 import com.evai.testing.automation.api.data.model.EvAIArticle;
+import com.evai.testing.automation.api.data.model.GeneratorRequestEntry;
 import com.evai.testing.automation.api.generators.article.policies.*;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +20,7 @@ public class ArticleGenerator {
 
     @NotNull
     @Contract("_, !null, _, _ -> new")
-    public EvAIArticle generate(int corpus, String[] layers, int user, int index) {
+    public SyntheticArticle generate(int corpus, String[] layers, int user, int index) {
         List<String> sequence = new LinkedList<>();
         Map<String, TermStats> stats = new HashMap<>();
 
@@ -29,7 +28,7 @@ public class ArticleGenerator {
             for (var name : layers) {
                 var layerId = source.getLayerId(name, user);
 
-                if (layerId == null || layerId.isEmpty()) notFound.OnLayerNotFound(name);
+                if (layerId == null || layerId.isEmpty()) notFound.onLayer(name);
 
                 var words = source.getTermsByLayerId(layerId);
                 for (var w : words) {
@@ -64,23 +63,29 @@ public class ArticleGenerator {
         var contentBuilder = new StringBuilder(sequence.size());
         sequence.forEach(contentBuilder::append);
 
-        return EvAIArticle.builder()
-                .requestId(UUID.randomUUID())
-                .additionalInformation("Additional info synth #" + index)
-                .content(contentBuilder.toString())
-                .detectedLanguage("GERMAN")
-                .processed(false)
-                .publisher("Article Generator")
-                .term("term")
-                .site("site.com")
-                .project("synthart")
-                .publicationDate(dateSource.generatePublishDate(index))
-                .creationDate(dateSource.generateCreatedDate(index))
-                .title("Synthetic Article #" + index)
-                .url("site.com/" + index)
-                .client(EvAIInputClient.GOOGLE)
-                .requestLanguage("de")
-                .build();
+        return SyntheticArticle.builder()
+                .article(
+                        EvAIArticle.builder()
+                                .requestId(UUID.randomUUID())
+                                .additionalInformation("Additional info synth #" + index)
+                                .content(contentBuilder.toString())
+                                .detectedLanguage("GERMAN")
+                                .processed(false)
+                                .publisher("Article Generator #" + index)
+                                .term("term")
+                                .site("site.com")
+                                .project("synthart")
+                                .publicationDate(dateSource.generatePublishDate(index))
+                                .creationDate(dateSource.generateCreatedDate(index))
+                                .title("Synthetic Article #" + index)
+                                .url("site.com/" + index)
+                                .client(EvAIInputClient.GOOGLE)
+                                .requestLanguage("de")
+                                .build())
+                .traits(GeneratorRequestEntry.builder()
+                        .corpus(corpus)
+                        .layerNames(layers)
+                        .userId(user).build()).build();
     }
 
 

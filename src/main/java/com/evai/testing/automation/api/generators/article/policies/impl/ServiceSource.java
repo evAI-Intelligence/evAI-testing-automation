@@ -4,30 +4,25 @@ import com.evai.testing.automation.api.data.AnnotatorEntityService;
 import com.evai.testing.automation.api.data.model.Entity;
 import com.evai.testing.automation.api.data.model.EntityLayer;
 import com.evai.testing.automation.api.generators.article.policies.ArticleGeneratorSourcePolicy;
-import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.util.Strings;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class MongoSource implements ArticleGeneratorSourcePolicy {
+public class ServiceSource implements ArticleGeneratorSourcePolicy {
 
-    private final AnnotatorEntityService service;
     private final List<EntityLayer> layers;
     private final List<Entity> entities;
     private final Random rng = new Random();
 
-    public MongoSource(AnnotatorEntityService service) {
-        this.service = service;
+    public ServiceSource(AnnotatorEntityService service) {
         this.layers = service.getLayers();
         this.entities = service.getEntities();
     }
 
     @Override
-    public String getLayerId(String name, int user) {
+    public String getLayerId(final String name, int user) {
         var selection = layers.stream()
                 .filter((l) -> l.getName().equals(name) && l.getUser() == user)
                 .collect(Collectors.toList());
@@ -39,7 +34,7 @@ public class MongoSource implements ArticleGeneratorSourcePolicy {
     }
 
     @Override
-    public List<String> getTermsByLayerId(String id) {
+    public List<String> getTermsByLayerId(final String id) {
         return entities.stream()
                 .filter((e) -> e.getLayer().equals(id))
                 .map(Entity::getContent)
